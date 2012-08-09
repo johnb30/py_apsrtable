@@ -5,7 +5,7 @@ py_apsrtable aims to be the python implemenation of the R package apsrtable (htt
 
 Currently only one model per table is supported. Options for the model includes standard errors, two-tailed p values, and one-tailed p values.
 
-In short, py_apsrtable is missing a large amount of the functionality present in apsrtable, but provides some basis for generating well-formatted LaTeX output from python statiscal models.
+In short, py_apsrtable is missing some of the functionality present in apsrtable, but provides some basis for generating well-formatted LaTeX output from python statiscal models.
 
 Future
 ------

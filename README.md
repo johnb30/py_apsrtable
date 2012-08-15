@@ -39,7 +39,7 @@ Usage is as follows:
     olsresult = sm.OLS(y, df).fit()
 
     #Assign the generateTable class with the initial values
-    a = py_apsrtable.generateTable('/path/to/file/table.text', olsresult, center='True', parens='se')
+    a = py_apsrtable.generateTable('/path/to/file/table.tex', olsresult, center='True', parens='se')
 
     #Create the model to put used in py_apsrtable
     model = a.createModel()

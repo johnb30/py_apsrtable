@@ -10,7 +10,14 @@ In short, py_apsrtable is missing some of the functionality present in apsrtable
 Future
 ------
 
-Long-term goals include support for multiple models, changing variable names, and changing header names. Also, I hope to integrate the functions into a class and make the flow more coherent.
+Long-term goals include support for multiple models, changing variable names, and 
+changing header names.
+
+Updates
+-------
+
+08.15.12 Changed the structure of the file around. The functions are now within the
+class generateTable. 
 
 Example
 -------
@@ -31,16 +38,19 @@ Usage is as follows:
     #Generate the OLS output and store it in olsresult
     olsresult = sm.OLS(y, df).fit()
 
+    #Assign the generateTable class with the initial values
+    a = py_apsrtable.generateTable('/path/to/file/table.text', olsresult, center='True', parens='se')
+
     #Create the model to put used in py_apsrtable
-    model = py_apsrtable.createModel(olsresult)
+    model = a.createModel()
 
     #Generate the first portion of the table
-    py_apsrtable.startTable('/path/to/file/table.tex', 'OLS Results Table', 'tab:ols', center='True', parens='se')
+    a.startTable('OLS Results Table', 'tab:ols')
 
     #Middle of the table
-    py_apsrtable.modelTable('/path/to/file/table.tex', model, parens='se')
+    a.modelTable(model)
 
     #Bottom of the table
-    py_apsrtable.endTable('/path/to/file/table.tex', center='True', parens='se')
+    a.endTable()
 
 

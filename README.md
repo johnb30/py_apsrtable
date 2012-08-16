@@ -18,14 +18,16 @@ statiscal models.
 Future
 ------
 
-Long-term goals include support for multiple models, changing variable names, and 
-changing header names.
+Long-term goals include support for multiple models.
 
 Updates
 -------
 
-08.15.12 Changed the structure of the file around. The functions are now within the
+08.15.12:
+
+* Changed the structure of the file around. The functions are now within the
 class generateTable. 
+* Added support for changing variable names.
 
 Example
 -------
@@ -46,8 +48,14 @@ Usage is as follows:
     #Generate the OLS output and store it in olsresult
     olsresult = sm.OLS(y, df).fit()
 
+    #Check the order of the variable names
+    print sorted(olsresult.params.iteritems())
+
+    #Define the names to replace the variables
+    replaceNames = ['Armed', 'Gross National Product', 'GNPDEFL', 'Population', 'Unemployment', 'Year', 'intercept']
+
     #Assign the generateTable class with the initial values
-    a = py_apsrtable.generateTable('/path/to/file/table.tex', olsresult, center='True', parens='se')
+    a = py_apsrtable.generateTable('/path/to/file/table.tex', olsresult, center = 'True', parens= 'se' , var_names = replaceNames)
 
     #Create the model to put used in py_apsrtable
     a.createModel()

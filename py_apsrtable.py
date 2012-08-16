@@ -1,6 +1,6 @@
 class generateTable(object):
     
-    def __init__(self, output, model, center='True', parens='se'):
+    def __init__(self, output, model, center='True', parens='se', var_names=None):
         """
         Parameters
         ----------
@@ -12,26 +12,47 @@ class generateTable(object):
 
         parens : What values should be in the parentheses, string. Options are 'se' for standard errors, 'pval' for p values, and 'pval_one' for one-tailed p values.
 
+        var_names : Strings to be used as variable names, list. 
+
+        Note
+        ----
+
+        When replacing the variable names it is important to look at the sorted ordering of the model (i.e. sorted(model.iteritems()) ) and order the list of replacement names accordingly. 
+
         """
         self.output = output
         self.model = model
         self.center = center
         self.parens = parens
+        self.var_names = var_names
 
     def createModel(self):
         """
         Takes the model to be placed in the table, turns it into a list, and determines the number of models.
 
         Returns
-        -------
+        ------
         output : A dict with each variable name as the key and the beta values and standard erros as the values. 
 
         """
         params = dict(self.model.params)
         bse = dict(self.model.bse)
         pvals = dict(self.model.pvalues)
-        self.inputModel = dict((k, [params[k], bse.get(k), pvals.get(k)]) for k in sorted(params.iterkeys()))
-        
+        tempModel = dict((k, [params[k], bse.get(k), pvals.get(k)]) for k in sorted(params.iterkeys()))
+        if self.var_names == None:
+            self.inputModel = tempModel
+        elif type(self.var_names) == list:
+            replace = self.var_names
+            newResults = []
+            resultsList = sorted(tempModel.iteritems())
+            for item in resultsList:
+                newVar = list(item)
+                newResults.append(newVar)
+            for i in range(len(newResults)):
+                newResults[i][0] = replace[i]
+                self.inputModel = dict(newResults)
+
+
     def startTable(self, caption, label, model_name=None, model_number=1):
         #TODO: Add support for multiple models.
         #TODO: Move the tableSize calculation to the createModel function? Or it's own helper function?
@@ -90,8 +111,6 @@ class generateTable(object):
 
 
     def modelTable(self): 
-        #TODO: Do something to the variable names and label them generically...ie x1, x2
-        #TODO: add support for changing of variable names
         """
         Generates the middle, which contains the actual model, of the LaTeX table using the model generated in the createModel function.
 

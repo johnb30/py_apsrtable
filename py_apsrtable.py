@@ -1,6 +1,6 @@
 class generateTable(object):
     
-    def __init__(self, output, model, center='True', parens='se', var_names=None):
+    def __init__(self, output, models, center='True', parens='se', var_names=None):
         """
         Parameters
         ----------
@@ -21,7 +21,7 @@ class generateTable(object):
 
         """
         self.output = output
-        self.model = model
+        self.models = models
         self.center = center
         self.parens = parens
         self.var_names = var_names
@@ -35,10 +35,26 @@ class generateTable(object):
         output : A dict with each variable name as the key and the beta values and standard erros as the values. 
 
         """
-        params = dict(self.model.params)
-        bse = dict(self.model.bse)
-        pvals = dict(self.model.pvalues)
-        tempModel = dict((k, [params[k], bse.get(k), pvals.get(k)]) for k in sorted(params.iterkeys()))
+        results = []
+        for test_model in self.models:
+            params = dict(test_model.params)
+            bse = dict(test_model.bse)
+            pvals = dict(test_model.pvalues)
+            results.append(dict((k, [params[k], bse.get(k), pvals.get(k)]) for k in sorted(params.iterkeys())))
+        tempModel = {}
+        for key in results[0]:
+            tempModel[key] = [results[0][key]]
+
+        for model in results[1:len(results)]:
+            for key in model:
+                if key not in tempModel:
+                    tempModel[key] = [['', '', '']]
+        for i in range(1,len(results)):
+            diff = set(tempModel) - set(results[i])
+            for key in results[i]:
+                tempModel[key].append(results[i][key])
+            for key in diff:
+                tempModel[key].append(['','',''])
         if self.var_names == None:
             self.inputModel = tempModel
         elif type(self.var_names) == list:
@@ -52,10 +68,7 @@ class generateTable(object):
                 newResults[i][0] = replace[i]
                 self.inputModel = dict(newResults)
 
-
-    def startTable(self, caption, label, model_name=None, model_number=1):
-        #TODO: Add support for multiple models.
-        #TODO: Move the tableSize calculation to the createModel function? Or it's own helper function?
+    def startTable(self, caption, label, model_name=None):
         """
         Generates the top, or header, portion of a LaTeX table.
 
@@ -75,15 +88,14 @@ class generateTable(object):
         
         """
         file = open(self.output, 'w')
+        model_number = len(self.models)
         tableSize = 'c '*(model_number)+'c'
         if model_name == None:
-            name = 'Model 1'
-        elif type(model_name) == str:
-            name =  model_name
-        else:
-            print 'Please enter a valid string for the model_name, or let the name default to "Model 1"'
-        if self.center == 'True':
-            header = """
+            name = []
+            for i in range(1, len(self.models)+1):
+                name.append('Model ' + str(i))
+            if self.center == 'True':
+                header = """
 \\begin{table}
 \caption{%s}
 \center
@@ -91,23 +103,100 @@ class generateTable(object):
 \\begin{center}
 \\begin{tabular}{%s}
 \hline\hline
-&      %s\\\\
+            """ % (caption, label, tableSize)
+                for label in name:
+                    header += '  &     %s' % (label)
+                header += """
+\\\\
 \hline
-            """ % (caption, label, tableSize, name)
-        elif self.center == 'False':
-            header = """
+"""
+            elif self.center == 'False':
+                header = """
 \\begin{table}
 \caption{%s}
 \label{%s}
 \\begin{tabular}{%s}
 \hline\hline
-%s
+            """ % (caption, label, tableSize)
+                for label in name:
+                    header += '  &     %s' % (label)
+                header += """
+\\\\
 \hline
-            """ % (caption, label, tableSize, name)
+"""
+            else:
+                print 'Please enter a valid string ("True" or "False") for the center argument'
+            file.write(header)
+            file.close()
+        elif len(self.models) == 1:
+            name =  model_name
+            if self.center == 'True':
+                header = """
+\\begin{table}
+\caption{%s}
+\center
+\label{%s}
+\\begin{center}
+\\begin{tabular}{%s}
+\hline\hline
+     &   %s \\\\
+\hline
+            """ % (caption, label, tableSize)
+                for label in name:
+                    header += '  &     %s' % (label)
+                header += """
+\\\\
+\hline
+"""
+            elif self.center == 'False':
+                header = """
+\\begin{table}
+\caption{%s}
+\label{%s}
+\\begin{tabular}{%s}
+\hline\hline
+     &   %s \\\\
+\hline
+""" % (caption, label, tableSize)
+                for label in name:
+                    header += '  &     %s' % (label)
+                header += """
+\\\\
+\hline
+"""     
+        elif len(self.models) > 1:
+            name =  model_name
+            if self.center == 'True':
+                header = """
+\\begin{table}
+\caption{%s}
+\center
+\label{%s}
+\\begin{center}
+\\begin{tabular}{%s}
+\hline\hline
+""" % (caption, label, tableSize)
+                for label in name:
+                    header += '  &     %s' % (label)
+                header += """\\\\
+\hline
+"""
+            elif self.center == 'False':
+                header = """
+\\begin{table}
+\caption{%s}
+\label{%s}
+\\begin{tabular}{%s}
+\hline\hline
+""" % (caption, label, tableSize)
+                for label in name:
+                    header += '  &     %s' % (label)
+                header += """
+\\\\
+\hline
+"""     
         else:
-            print 'Please enter a valid string ("True" or "False") for the center argument'
-        file.write(header)
-        file.close()
+            print 'Please enter a valid list or string for model_name'
 
 
     def modelTable(self): 
@@ -122,29 +211,93 @@ class generateTable(object):
         if type(self.inputModel) == dict:
             if self.parens == 'se':
                 file = open(self.output, 'a')                    
-                for key, value in sorted(self.inputModel.iteritems()):
-                    model = str(key) + '  &  ' + str(round(value[0],2)) + ' \\\\ \n     &     ' + '(' + str(round(value[1],2)) + ')' + ' \\\\ \n'
-                    file.write(model)            
+                text = ''
+                for key in sorted(self.inputModel):
+                    text += str(key)
+                    for i in range(len(self.models)):
+                        beta = self.inputModel[key][i][0]
+                        if beta == '':
+                            text += '  &   '
+                        else:
+                            int(beta)
+                            text += '   &   ' +  str(round(beta,2))
+                    text += """  \\\\  
+                            """
+                    for i in range(len(self.models)):
+                        parens = self.inputModel[key][i][1]
+                        if parens == '':
+                            text += '  &   '
+                        else:
+                            if round(self.inputModel[key][i][2],2) <= .05:
+                                int(parens)
+                                text += '   &   ' +  '(' + str(round(parens,2)) + '*)'
+                            elif round(self.inputModel[key][i][2],2) > .05:
+                                int(parens)
+                                text += '   &   ' +  '(' + str(round(parens,2)) + ')'
+                    text += """  \\\\
+                            """
+                file.write(text)            
                 file.close()
             elif self.parens == 'pval':
                 file = open(self.output, 'a')
-                for key, value in sorted(self.inputModel.iteritems()):
-                    if round(value[2],2) <= .05: 
-                        model = str(key) + '  &  ' + str(round(value[0],2)) + ' \\\\ \n     &     ' + '(' + str(round(value[2],2)) + '*)' + ' \\\\ \n'
-                        file.write(model)
-                    elif round(value[2],2) > .05:
-                        model = str(key) + '  &  ' + str(round(value[0],2)) + ' \\\\ \n     &     ' + '(' + str(round(value[2],2)) + ')' + ' \\\\ \n'
-                        file.write(model)  
+                file = open(self.output, 'a')                    
+                text = ''
+                for key in sorted(self.inputModel):
+                    text += str(key)
+                    for i in range(len(self.models)):
+                        beta = self.inputModel[key][i][0]
+                        if beta == '':
+                            text += '  &   '
+                        else:
+                            int(beta)
+                            text += '   &   ' +  str(round(beta,2))
+                    text += """  \\\\  
+                            """
+
+                    for i in range(len(self.models)):
+                        parens = self.inputModel[key][i][2]
+                        if parens == '':
+                            text += '  &   '
+                        else:
+                            if round(self.inputModel[key][i][2],2) <= .05:
+                                int(parens)
+                                text += '   &   ' +  '(' + str(round(parens,2)) + '*)'
+                            elif round(self.inputModel[key][i][2],2) > .05:
+                                int(parens)
+                                text += '   &   ' +  '(' + str(round(parens,2)) + ')'
+                    text += """  \\\\
+                            """
+                file.write(text)            
                 file.close()
             elif self.parens == 'pval_one':
-                file = open(self.output, 'a')
-                for key, value in sorted(self.inputModel.iteritems()):
-                    if round((value[2]/2.)) <= .05:
-                        model = str(key) + '  &  ' + str(round(value[0],2)) + ' \\\\ \n     &     ' + '(' + str(round((value[2]/2.),2)) + '*)' + ' \\\\ \n'
-                        file.write(model)
-                    elif round((value[2]/2.)) > .05:
-                        model = str(key) + '  &  ' + str(round(value[0],2)) + ' \\\\ \n     &     ' + '(' + str(round((value[2]/2.),2)) + '*)' + ' \\\\ \n'
-                        file.write(model)
+                file = open(self.output, 'a')                    
+                text = ''
+                for key in sorted(self.inputModel):
+                    text += str(key)
+                    for i in range(len(self.models)):
+                        beta = self.inputModel[key][i][0]
+                        if beta == '':
+                            text += '  &   '
+                        else:
+                            int(beta)
+                            text += '   &   ' +  str(round(beta,2))
+                    text += """  \\\\  
+                            """
+
+                    for i in range(len(self.models)):
+                        parens = (self.inputModel[key][i][2]/2.)
+                        if parens == '':
+                            text += '  &   '
+                        else:
+                            if round((self.inputModel[key][i][2]/2.),2) <= .05:
+                                int(parens)
+                                text += '   &   ' +  '(' + str(round(parens,2)) + '*)'
+                            elif round((self.inputModel[key][i][2]/2.),2) > .05:
+                                int(parens)
+                                text += '   &   ' +  '(' + str(round(parens,2)) + ')'
+                    text += """  \\\\
+                            """
+                file.write(text)            
                 file.close()
             else:
                 print 'Please input a valid entry for the parens argument'
@@ -209,6 +362,7 @@ class generateTable(object):
         file.close()
 
     
+
 
 
 

@@ -8,3 +8,5 @@ py_apsrtable.pyc
 *.swp
 
 .README.md.swp
+
+.DS_Store

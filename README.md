@@ -11,6 +11,11 @@ formatting. The formatting is also nice for other applications.
 
 Options for the models includes standard errors, two-tailed p values, and one-tailed p values.
 
+Future
+------
+
+Currently the "magic" stars are only added for p values lower than .05. Eventually I would like to add an option to turn off the stars and an option to change the level of the stars.
+Maybe even have an option for having a different number of stars at different levels of p. The only one of these that I really want to implement is the ability to turn OFF the stars.
 
 Updates
 -------

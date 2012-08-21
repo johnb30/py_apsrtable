@@ -184,9 +184,14 @@ class generateTable(object):
             print 'Please enter a valid list or string for model_name'
 
 
-    def modelTable(self): 
+    def modelTable(self, stars=True): 
         """
         Generates the middle, which contains the actual model, of the LaTeX table using the model generated in the createModel function.
+
+        Input
+        -----
+
+        stars : Whether or not to include stars next the values in parentheses if the p value for that variable is less than .05, boolean. Defaults to True.
 
         Outputs
         -------
@@ -195,111 +200,205 @@ class generateTable(object):
         """
         #Sanity check to make sure a dict is getting passed and not something weird
         if type(self.inputModel) == dict:
-            #Case where standard errors are placed in the parentheses.
-            if self.parens == 'se':
-                file = open(self.output, 'a')
-                #Initialize the text variable that will be written to the table
-                text = ''
-                #Iterating through each key in the model 
-                for key in sorted(self.inputModel):
-                    #Add the specific key (variable name) to the text
-                    text += str(key)
-                    #Iterating through the each of the models and adding the beta values (stored in inputModel[key][i][0]) to the text.
-                    for i in range(len(self.models)):
-                        beta = self.inputModel[key][i][0]
-                        #If that model doesn't have any values for that particular variable append an empty column
-                        if beta == '':
-                            text += '  &   '
-                        #If there is a value, append that value rounded to 2 decimal places
-                        else:
-                            int(beta)
-                            text += '   &   ' +  str(round(beta,2))
-                    #At the end of each key (variable) add the LaTeX newline character
-                    text += """  \\\\  
-                            """
-                    #Doing the same procedure as above except for the values that should go in parentheses
-                    for i in range(len(self.models)):
-                        parens = self.inputModel[key][i][1]
-                        if parens == '':
-                            text += '  &   '
-                        else:
-                            #Checking the p values in order to add the magic stars
-                            if round(self.inputModel[key][i][2],2) <= .05:
-                                int(parens)
-                                text += '   &   ' +  '(' + str(round(parens,2)) + ')' + '*'
-                            elif round(self.inputModel[key][i][2],2) > .05:
+            #The magic stars should be added.
+            if stars == True:
+                #Case where standard errors are placed in the parentheses.
+                if self.parens == 'se':
+                    file = open(self.output, 'a')
+                    #Initialize the text variable that will be written to the table
+                    text = ''
+                    #Iterating through each key in the model 
+                    for key in sorted(self.inputModel):
+                        #Add the specific key (variable name) to the text
+                        text += str(key)
+                        #Iterating through the each of the models and adding the beta values (stored in inputModel[key][i][0]) to the text.
+                        for i in range(len(self.models)):
+                            beta = self.inputModel[key][i][0]
+                            #If that model doesn't have any values for that particular variable append an empty column
+                            if beta == '':
+                                text += '  &   '
+                            #If there is a value, append that value rounded to 2 decimal places
+                            else:
+                                int(beta)
+                                text += '   &   ' +  str(round(beta,2))
+                        #At the end of each key (variable) add the LaTeX newline character
+                        text += """  \\\\  
+                                """
+                        #Doing the same procedure as above except for the values that should go in parentheses
+                        for i in range(len(self.models)):
+                            parens = self.inputModel[key][i][1]
+                            if parens == '':
+                                text += '  &   '
+                            else:
+                                #Checking the p values in order to add the magic stars
+                                if round(self.inputModel[key][i][2],2) <= .05:
+                                    int(parens)
+                                    text += '   &   ' +  '(' + str(round(parens,2)) + ')' + '*'
+                                elif round(self.inputModel[key][i][2],2) > .05:
+                                    int(parens)
+                                    text += '   &   ' +  '(' + str(round(parens,2)) + ')'
+                        text += """  \\\\
+                                """
+                    #Write the model to the file and close the file
+                    file.write(text)            
+                    file.close()
+                #Everything in this block is the same as the self.parens == 'se' except adding the pvalues to the parens instead of the standard errors
+                elif self.parens == 'pval':
+                    file = open(self.output, 'a')
+                    text = ''
+                    for key in sorted(self.inputModel):
+                        text += str(key)
+                        for i in range(len(self.models)):
+                            beta = self.inputModel[key][i][0]
+                            if beta == '':
+                                text += '  &   '
+                            else:
+                                int(beta)
+                                text += '   &   ' +  str(round(beta,2))
+                        text += """  \\\\  
+                                """
+                        for i in range(len(self.models)):
+                            parens = self.inputModel[key][i][2]
+                            if parens == '':
+                                text += '  &   '
+                            else:
+                                if round(self.inputModel[key][i][2],2) <= .05:
+                                    int(parens)
+                                    text += '   &   ' +  '(' + str(round(parens,2)) + ')' + '*'
+                                elif round(self.inputModel[key][i][2],2) > .05:
+                                    int(parens)
+                                    text += '   &   ' +  '(' + str(round(parens,2)) + ')'
+                        text += """  \\\\
+                                """
+                    file.write(text)            
+                    file.close()
+                #Everything the same here too, just adding one-tailed p values to the parens
+                elif self.parens == 'pval_one':
+                    file = open(self.output, 'a')                    
+                    text = ''
+                    for key in sorted(self.inputModel):
+                        text += str(key)
+                        for i in range(len(self.models)):
+                            beta = self.inputModel[key][i][0]
+                            if beta == '':
+                                text += '  &   '
+                            else:
+                                int(beta)
+                                text += '   &   ' +  str(round(beta,2))
+                        text += """  \\\\  
+                                """
+                        for i in range(len(self.models)):
+                            parens = (self.inputModel[key][i][2]/2.)
+                            if parens == '':
+                                text += '  &   '
+                            else:
+                                if round((self.inputModel[key][i][2]/2.),2) <= .05:
+                                    int(parens)
+                                    text += '   &   ' +  '(' + str(round(parens,2)) + ')' + '*'
+                                elif round((self.inputModel[key][i][2]/2.),2) > .05:
+                                    int(parens)
+                                    text += '   &   ' +  '(' + str(round(parens,2)) + ')'
+                        text += """  \\\\
+                                """
+                    file.write(text)            
+                    file.close()
+                #Print error message if the entry for parens isn't correct
+                else:
+                    print 'Please input a valid entry for the parens argument'
+            #This is the section that takes care of the stars == False arg. Exact same as above except removed code to add stars. 
+            elif stars == False:
+                #Case where standard errors are placed in the parentheses.
+                if self.parens == 'se':
+                    file = open(self.output, 'a')
+                    #Initialize the text variable that will be written to the table
+                    text = ''
+                    #Iterating through each key in the model 
+                    for key in sorted(self.inputModel):
+                        #Add the specific key (variable name) to the text
+                        text += str(key)
+                        #Iterating through the each of the models and adding the beta values (stored in inputModel[key][i][0]) to the text.
+                        for i in range(len(self.models)):
+                            beta = self.inputModel[key][i][0]
+                            #If that model doesn't have any values for that particular variable append an empty column
+                            if beta == '':
+                                text += '  &   '
+                            #If there is a value, append that value rounded to 2 decimal places
+                            else:
+                                int(beta)
+                                text += '   &   ' +  str(round(beta,2))
+                        #At the end of each key (variable) add the LaTeX newline character
+                        text += """  \\\\  
+                                """
+                        #Doing the same procedure as above except for the values that should go in parentheses
+                        for i in range(len(self.models)):
+                            parens = self.inputModel[key][i][1]
+                            if parens == '':
+                                text += '  &   '
+                            else:
                                 int(parens)
                                 text += '   &   ' +  '(' + str(round(parens,2)) + ')'
-                    text += """  \\\\
-                            """
-                #Write the model to the file and close the file
-                file.write(text)            
-                file.close()
-            #Everything in this block is the same as the self.parens == 'se' except adding the pvalues to the parens instead of the standard errors
-            elif self.parens == 'pval':
-                file = open(self.output, 'a')
-                text = ''
-                for key in sorted(self.inputModel):
-                    text += str(key)
-                    for i in range(len(self.models)):
-                        beta = self.inputModel[key][i][0]
-                        if beta == '':
-                            text += '  &   '
-                        else:
-                            int(beta)
-                            text += '   &   ' +  str(round(beta,2))
-                    text += """  \\\\  
-                            """
-
-                    for i in range(len(self.models)):
-                        parens = self.inputModel[key][i][2]
-                        if parens == '':
-                            text += '  &   '
-                        else:
-                            if round(self.inputModel[key][i][2],2) <= .05:
-                                int(parens)
-                                text += '   &   ' +  '(' + str(round(parens,2)) + ')' + '*'
-                            elif round(self.inputModel[key][i][2],2) > .05:
+                        text += """  \\\\
+                                """
+                    #Write the model to the file and close the file
+                    file.write(text)            
+                    file.close()
+                #Everything in this block is the same as the self.parens == 'se' except adding the pvalues to the parens instead of the standard errors
+                elif self.parens == 'pval':
+                    file = open(self.output, 'a')
+                    text = ''
+                    for key in sorted(self.inputModel):
+                        text += str(key)
+                        for i in range(len(self.models)):
+                            beta = self.inputModel[key][i][0]
+                            if beta == '':
+                                text += '  &   '
+                            else:
+                                int(beta)
+                                text += '   &   ' +  str(round(beta,2))
+                        text += """  \\\\  
+                                """
+                        for i in range(len(self.models)):
+                            parens = self.inputModel[key][i][2]
+                            if parens == '':
+                                text += '  &   '
+                            else:
                                 int(parens)
                                 text += '   &   ' +  '(' + str(round(parens,2)) + ')'
-                    text += """  \\\\
-                            """
-                file.write(text)            
-                file.close()
-            #Everything the same here too, just adding one-tailed p values to the parens
-            elif self.parens == 'pval_one':
-                file = open(self.output, 'a')                    
-                text = ''
-                for key in sorted(self.inputModel):
-                    text += str(key)
-                    for i in range(len(self.models)):
-                        beta = self.inputModel[key][i][0]
-                        if beta == '':
-                            text += '  &   '
-                        else:
-                            int(beta)
-                            text += '   &   ' +  str(round(beta,2))
-                    text += """  \\\\  
-                            """
-
-                    for i in range(len(self.models)):
-                        parens = (self.inputModel[key][i][2]/2.)
-                        if parens == '':
-                            text += '  &   '
-                        else:
-                            if round((self.inputModel[key][i][2]/2.),2) <= .05:
-                                int(parens)
-                                text += '   &   ' +  '(' + str(round(parens,2)) + ')' + '*'
-                            elif round((self.inputModel[key][i][2]/2.),2) > .05:
+                        text += """  \\\\
+                                """
+                    file.write(text)            
+                    file.close()
+                #Everything the same here too, just adding one-tailed p values to the parens
+                elif self.parens == 'pval_one':
+                    file = open(self.output, 'a')                    
+                    text = ''
+                    for key in sorted(self.inputModel):
+                        text += str(key)
+                        for i in range(len(self.models)):
+                            beta = self.inputModel[key][i][0]
+                            if beta == '':
+                                text += '  &   '
+                            else:
+                                int(beta)
+                                text += '   &   ' +  str(round(beta,2))
+                        text += """  \\\\  
+                                """
+                        for i in range(len(self.models)):
+                            parens = (self.inputModel[key][i][2]/2.)
+                            if parens == '':
+                                text += '  &   '
+                            else:
                                 int(parens)
                                 text += '   &   ' +  '(' + str(round(parens,2)) + ')'
-                    text += """  \\\\
-                            """
-                file.write(text)            
-                file.close()
-            #Print error message if the entry for parens isn't correct
+                        text += """  \\\\
+                                """
+                    file.write(text)            
+                    file.close()
+                #Print error message if the entry for parens isn't correct
+                else:
+                    print 'Please input a valid entry for the parens argument'
             else:
-                print 'Please input a valid entry for the parens argument'
+                print 'Please input a valid argument (True or false) for the stars option'
         #Print error message if the models aren't in a dict
         else:
             print 'Please input a dict object for the models'

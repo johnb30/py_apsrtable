@@ -25,7 +25,7 @@ Maybe even have an option for having a different number of stars at different le
 Example
 -------
 
-Usage for a single model:
+Usage for a single model::
     
     #Imports
     import py_apsrtable
@@ -65,7 +65,7 @@ Usage for a single model:
     #Bottom of the table
     a.end_table()
 
-Usage for multiple models:
+Usage for multiple models::
 
     #Imports
     import py_apsrtable

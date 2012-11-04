@@ -1,1 +1,3 @@
-v0.1, November 3, 2012 -- Initial release.
+v0.01, November 3, 2012 -- Initial release.
+v0.1, November 3, 2012 -- Fixing some issues with the initial release. 
+v0.2, November 3, 2012 -- More issues. 

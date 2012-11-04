@@ -26,7 +26,7 @@ class generateTable(object):
         self.parens = parens
         self.var_names = var_names
 
-    def createModel(self):
+    def create_model(self):
         """
         Takes the model to be placed in the table, turns it into a list, and determines the number of models.
 
@@ -77,7 +77,7 @@ class generateTable(object):
                 newResults[i][0] = replace[i]
                 self.inputModel = dict(newResults)
 
-    def startTable(self, caption, label, model_name=None):
+    def start_table(self, caption, label, model_name=None):
         """
         Generates the top, or header, portion of a LaTeX table.
 
@@ -184,7 +184,7 @@ class generateTable(object):
             print 'Please enter a valid list or string for model_name'
 
 
-    def modelTable(self, stars=True): 
+    def model_table(self, stars=True): 
         """
         Generates the middle, which contains the actual model, of the LaTeX table using the model generated in the createModel function.
 
@@ -198,6 +198,8 @@ class generateTable(object):
         Writes the middle of the LaTeX, which contains the actual model information, to the output file.
         
         """
+        #TODO: Refactor the code to add another function that takes care of the looping so the code cleaner/more
+        #compact
         #Sanity check to make sure a dict is getting passed and not something weird
         if type(self.inputModel) == dict:
             #The magic stars should be added.
@@ -404,7 +406,7 @@ class generateTable(object):
             print 'Please input a dict object for the models'
 
                       
-    def endTable(self):
+    def end_table(self):
         """
         Generates the bottom, or footer, portion of a LaTeX table.
 

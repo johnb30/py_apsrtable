@@ -1,3 +1,7 @@
+============
+py_apsrtable
+============
+
 Overview
 --------
 
@@ -17,21 +21,6 @@ Future
 Currently the "magic" stars are only added for p values lower than .05. Eventually I would like to add an option to change the level at which the stars appear.
 Maybe even have an option for having a different number of stars at different levels of p. None of these are particularly pressing for me. 
 
-Updates
--------
-08.20.12:
-
-* Added the ability to turn the stars off.
-
-08.17.12:
-
-* Added support for multiple models.
-
-08.15.12:
-
-* Changed the structure of the file around. The functions are now within the
-class generateTable. 
-* Added support for changing variable names.
 
 Example
 -------
@@ -65,16 +54,16 @@ Usage for a single model:
     a = py_apsrtable.generateTable('/path/to/file/table.tex', models, center = 'True', parens= 'se' , var_names = replaceNames)
 
     #Create the model to be used
-    a.createModel()
+    a.create_model()
 
     #Generate the first portion of the table
-    a.startTable('OLS Results Table', 'tab:ols', model_name=None)
+    a.start_table('OLS Results Table', 'tab:ols', model_name=None)
 
     #Middle of the table
-    a.modelTable(stars=True)
+    a.model_table(stars=True)
 
     #Bottom of the table
-    a.endTable()
+    a.end_table()
 
 Usage for multiple models:
 
@@ -107,16 +96,16 @@ Usage for multiple models:
     a = py_apsrtable.generateTable('/path/to/file/table.tex', models, center = 'True', parens= 'se' , var_names = replaceNames)
 
     #Create the model to be used in py_apsrtable
-    a.createModel()
+    a.create_model()
 
     #Generate the first portion of the table
-    a.startTable('OLS Results Table', 'tab:ols', model_name=None)
+    a.start_table('OLS Results Table', 'tab:ols', model_name=None)
 
     #Middle of the table
-    a.modelTable(stars=True)
+    a.model_table(stars=True)
 
     #Bottom of the table
-    a.endTable()
+    a.end_table()
 
 
 

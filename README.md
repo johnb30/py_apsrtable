@@ -17,14 +17,14 @@ The formatting is also nice for other applications.
 Options for the models includes standard errors, two-tailed p values, and 
 one-tailed p values. The variable and model names can be changed, and the stars
 (*) can be placed next to the values in parentheses depending on the
-signifigance level defined by the user. 
+significance level defined by the user. 
 
 Updates
 -------
 
 #####01.02.13
 
-- Added the ability to change the signfigance level.
+- Added the ability to change the signficance level.
 - Refactored the code some to be cleaner 
 
 Future

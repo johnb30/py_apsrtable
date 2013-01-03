@@ -142,7 +142,7 @@ class generateTable(object):
 
         label : The LaTeX label for the table (e.g. "tab:ols"), string. 
 
-        model_name : Name of the model, string. Optional. If not included model
+        model_name : Name of the model, list. Optional. If not included model
         names default to 'Model 1', 'Model 2', etc.
 
         Output
@@ -303,8 +303,25 @@ class generateTable(object):
         file.write(footer)
         file.close()
 
-    
+    def create_table(self, caption, label, model_name = None, stars=True):
+        """
+        Combines all of the model-creation functions together into one easy to
+        use function. 
 
+        Inputs
+        ------
+        caption : The caption for the table (e.g. "OLS Results"), string. 
 
+        label : The LaTeX label for the table (e.g. "tab:ols"), string. 
 
+        model_name : Name of the model, list. Optional. If not included model
+        names default to 'Model 1', 'Model 2', etc.
 
+        stars : Whether or not to include stars next the values in parentheses
+        if the p value for that variable is less than the specified significance
+        level, boolean. Defaults to True.
+        """
+        self.create_model()
+        self.start_table(caption, label, model_name=model_name)
+        self.model_table(stars=stars)
+        self.end_table()

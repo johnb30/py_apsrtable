@@ -10,3 +10,7 @@ py_apsrtable.pyc
 .README.md.swp
 
 .DS_Store
+
+dist/py_apsrtable-0.1.tar.gz
+
+py_apsrtable/__init__.pyc

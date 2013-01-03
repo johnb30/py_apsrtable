@@ -289,7 +289,7 @@ class generateTable(object):
 \end{tabular}
 \end{center}
 \end{table}
-                """ % (tableSize, tableSize)
+                """ % (tableSize, tableSize, self.sig_level)
             else:
                 print 'Please input a valid entry for the parens argument'
         elif self.center == 'False':
@@ -299,7 +299,7 @@ class generateTable(object):
 \multicolumn{%d}{l}{\\footnotesize{$^*$ indicates significance at $p \le$ %.2f}}
 \end{tabular}
 \end{table}
-                """ % (tableSize, tableSize)
+                """ % (tableSize, tableSize, self.sig_level)
         file.write(footer)
         file.close()
 

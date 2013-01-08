@@ -22,6 +22,11 @@ significance level defined by the user.
 Updates
 -------
 
+#####01.07.13
+
+- Added the ability to print the table to the Python shell instead of writing to
+  a file. 
+
 #####01.02.13
 
 - Simplified the execution down to one function.
@@ -66,11 +71,12 @@ Usage for a single model::
     'Unemployment', 'Year', 'intercept']
 
     #Assign the generateTable class with the initial values
+    #Print is an alternate option for the output argument
     a = py_apsrtable.generateTable('/path/to/file/table.tex', models, 
     center = 'True', parens= 'se', sig_level=0.05, var_names = replaceNames)
 
     #Create the table
-    a.create_table(caption='OLS Results Table', lable='tab:ols', model_name = None, stars=True)
+    a.create_table(caption='OLS Results Table', label='tab:ols', model_name = None, stars=True)
 
 Usage for multiple models::
 
@@ -101,7 +107,7 @@ Usage for multiple models::
     'Unemployment', 'Year', 'intercept']
 
     #Assign the generateTable class with the initial values
-    a = py_apsrtable.generateTable('/path/to/file/table.tex', models, center = 'True', parens= 'se', sig_level=0.10, var_names = replaceNames)
+    a = py_apsrtable.generateTable('print', models, center = 'True', parens= 'se', sig_level=0.10, var_names = replaceNames)
 
     #Create the table
     a.create_table(caption='OLS Results Table', lable='tab:ols', model_name = None, stars=True)

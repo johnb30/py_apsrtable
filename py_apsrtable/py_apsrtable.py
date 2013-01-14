@@ -130,6 +130,23 @@ class generateTable(object):
                         text += '   &   ' +  '(' + str(round(parens,2)) + ')'
             text += """  \\\\
                     """
+#TODO: This implementation is messy and I don't like it, but it gets the idea
+#down. These values need to be put into a list or dict and then iterate through
+#it. 
+        text += """ 
+                    $N$ """
+        for model in self.models:
+            text += '    &    ' + str(model.nobs)
+        text += """ \\\\
+                    AIC """
+        for model in self.models:
+            text += '    &    ' + str(round(model.aic, 2))
+        text += """ \\\\
+                    BIC """
+        for model in self.models:
+            text += '    &    ' + str(round(model.bic))
+        text += """ \\\\ \hline
+                """
         return text            
 
     def start_table(self, caption, label, model_name=None):
